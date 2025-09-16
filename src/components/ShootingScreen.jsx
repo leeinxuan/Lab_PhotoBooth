@@ -21,9 +21,9 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 	const [isRetaking, setIsRetaking] = useState(false);
 	const videoRef = useRef(null);
 
-	// 摄像头初始化函数
+	// 攝影機初始化函數
 	const initializeCamera = useCallback(async () => {
-		console.log('正在初始化摄像头...');
+		console.log('正在初始化攝影機...');
 		
 		if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
 			setCameraError('您的瀏覽器不支援攝影機功能。請使用現代瀏覽器如 Chrome、Firefox 或 Safari。');
@@ -31,45 +31,45 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 		}
 
 		try {
-			console.log('请求摄像头权限...');
+			console.log('請求攝影機權限...');
 			const stream = await navigator.mediaDevices.getUserMedia({ 
 				video: videoConstraints,
 				audio: false 
 			});
 			
-			console.log('摄像头流获取成功:', stream);
+			console.log('攝影機串流獲取成功:', stream);
 			
 			if (videoRef.current) {
 				videoRef.current.srcObject = stream;
 				
-				// 添加事件监听器来确保视频加载
+				// 添加事件監聽器來確保影片載入
 				videoRef.current.onloadedmetadata = () => {
-					console.log('视频元数据加载完成');
-					console.log('视频尺寸:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
+					console.log('影片元數據載入完成');
+					console.log('影片尺寸:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
 				};
 				
 				videoRef.current.oncanplay = () => {
-					console.log('视频可以播放');
+					console.log('影片可以播放');
 				};
 				
 				videoRef.current.onerror = (e) => {
-					console.error('视频播放错误:', e);
-					setCameraError('視頻播放出現錯誤。請檢查攝像頭是否被其他應用程序佔用。');
+					console.error('影片播放錯誤:', e);
+					setCameraError('影片播放出現錯誤。請檢查攝影機是否被其他應用程式佔用。');
 				};
 			}
 		} catch (err) {
-			console.error('摄像头访问错误:', err);
+			console.error('攝影機存取錯誤:', err);
 			let errorMessage = '無法存取攝影機。';
 			
 			if (err.name === 'NotAllowedError') {
-				errorMessage = '攝像頭權限被拒絕。請允許瀏覽器訪問攝像頭並重新整理頁面。';
+				errorMessage = '攝影機權限被拒絕。請允許瀏覽器存取攝影機並重新整理頁面。';
 			} else if (err.name === 'NotFoundError') {
-				errorMessage = '未找到攝像頭設備。請檢查攝像頭是否已連接。';
+				errorMessage = '未找到攝影機裝置。請檢查攝影機是否已連接。';
 			} else if (err.name === 'NotReadableError') {
-				errorMessage = '攝像頭被其他應用程序佔用。請關閉其他使用攝像頭的應用程序。';
+				errorMessage = '攝影機被其他應用程式佔用。請關閉其他使用攝影機的應用程式。';
 			} else if (err.name === 'OverconstrainedError') {
-				errorMessage = '攝像頭不支持所需的設置。正在嘗試使用默認設置...';
-				// 尝试使用更宽松的约束
+				errorMessage = '攝影機不支援所需的設定。正在嘗試使用預設設定...';
+				// 嘗試使用更寬鬆的約束
 				try {
 					const fallbackStream = await navigator.mediaDevices.getUserMedia({ 
 						video: { facingMode: 'user' } 
@@ -77,9 +77,9 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 					if (videoRef.current) {
 						videoRef.current.srcObject = fallbackStream;
 					}
-					return; // 成功获取备用流
+					return; // 成功獲取備用串流
 				} catch (fallbackErr) {
-					console.error('备用摄像头设置也失败:', fallbackErr);
+					console.error('備用攝影機設定也失敗:', fallbackErr);
 				}
 			}
 			
@@ -95,17 +95,17 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 				const stream = videoRef.current.srcObject;
 				const tracks = stream.getTracks();
 				tracks.forEach((track) => {
-					console.log('停止摄像头轨道:', track.kind);
+					console.log('停止攝影機軌道:', track.kind);
 					track.stop();
 				});
 			}
 		};
 	}, [initializeCamera]);
 
-	// 检查摄像头状态
+	// 檢查攝影機狀態
 	const checkCameraStatus = useCallback(() => {
 		if (!videoRef.current) {
-			console.log('视频元素不存在');
+			console.log('影片元素不存在');
 			return false;
 		}
 		
@@ -113,28 +113,28 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 		const stream = video.srcObject;
 		
 		if (!stream) {
-			console.log('摄像头流不存在');
+			console.log('攝影機串流不存在');
 			return false;
 		}
 		
 		const videoTrack = stream.getVideoTracks()[0];
 		if (!videoTrack || videoTrack.readyState === 'ended') {
-			console.log('视频轨道已结束');
+			console.log('影片軌道已結束');
 			return false;
 		}
 		
 		if (video.videoWidth === 0 || video.videoHeight === 0) {
-			console.log('视频尺寸为0');
+			console.log('影片尺寸為0');
 			return false;
 		}
 		
-		console.log('摄像头状态正常');
+		console.log('攝影機狀態正常');
 		return true;
 	}, []);
 
 	const capture = useCallback(() => {
 		if (!checkCameraStatus()) {
-			console.log('摄像头状态异常，尝试重新初始化...');
+			console.log('攝影機狀態異常，嘗試重新初始化...');
 			initializeCamera();
 			return;
 		}
@@ -150,7 +150,7 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 			ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 			const imageSrc = canvas.toDataURL('image/jpeg');
 			
-			// 显示预览并询问是否重拍
+			// 顯示預覽並詢問是否重拍
 			setCurrentPreview(imageSrc);
 			setShowPreview(true);
 			setIsCountingDown(false);
@@ -164,9 +164,9 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 		setCurrentPreview(null);
 		
 		if (newCaptures.length < selectedFrame.photoCount) {
-			// 在开始下一张拍摄前检查摄像头状态
+			// 在開始下一張拍攝前檢查攝影機狀態
 			if (!checkCameraStatus()) {
-				console.log('摄像头状态异常，重新初始化...');
+				console.log('攝影機狀態異常，重新初始化...');
 				initializeCamera();
 			}
 			setCountdown(3);
@@ -181,9 +181,9 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 		setCurrentPreview(null);
 		setIsRetaking(true);
 		
-		// 确保摄像头流仍然活跃
+		// 確保攝影機串流仍然活躍
 		if (!checkCameraStatus()) {
-			console.log('摄像头状态异常，重新初始化...');
+			console.log('攝影機狀態異常，重新初始化...');
 			initializeCamera();
 		}
 		
@@ -202,14 +202,14 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 		}
 	}, [countdown, isCountingDown, capture, cameraError]);
 
-	// 重置重拍状态
+	// 重置重拍狀態
 	useEffect(() => {
 		if (isRetaking) {
 			setIsRetaking(false);
 		}
 	}, [isRetaking]);
 
-	// 如果显示预览，显示询问页面
+	// 如果顯示預覽，顯示詢問頁面
 	if (showPreview) {
 		return (
 			<Card
@@ -224,7 +224,7 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 				bodyStyle={{ padding: 24, textAlign: 'center' }}
 			>
 				<Title level={2} style={{ marginBottom: 24, color: '#1890ff' }}>
-					第 {captures.length + 1} 张照片拍摄完成！
+					第 {captures.length + 1} 張照片拍攝完成！
 				</Title>
 				
 				<div style={{ 
@@ -235,7 +235,7 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 					gap: '24px',
 					flexWrap: 'wrap'
 				}}>
-					{/* 拍摄的照片预览 */}
+					{/* 拍攝的照片預覽 */}
 					<div style={{ 
 						width: '300px', 
 						height: '225px', 
@@ -246,17 +246,17 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 					}}>
 						<img 
 							src={currentPreview} 
-							alt="拍摄预览" 
+							alt="拍攝預覽" 
 							style={{ 
 								width: '100%', 
 								height: '100%', 
 								objectFit: 'cover',
-								transform: 'scaleX(-1)' // 镜像翻转
+								transform: 'scaleX(-1)' // 鏡像翻轉
 							}} 
 						/>
 					</div>
 					
-					{/* 询问内容 */}
+					{/* 詢問內容 */}
 					<div style={{ 
 						flex: 1, 
 						minWidth: '300px',
@@ -264,7 +264,7 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 						padding: '20px'
 					}}>
 						<Title level={3} style={{ marginBottom: 16, color: '#333' }}>
-							您觉得这张照片怎么样？
+							您覺得這張照片怎麼樣？
 						</Title>
 						<Text style={{ 
 							display: 'block', 
@@ -273,8 +273,8 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 							fontSize: '16px',
 							lineHeight: '1.6'
 						}}>
-							如果满意这张照片，请点击"保留照片"继续拍摄下一张。<br/>
-							如果不满意，可以点击"重新拍摄"重新拍摄这张照片。
+							如果滿意這張照片，請點擊"保留照片"繼續拍攝下一張。<br/>
+							如果不滿意，可以點擊"重新拍攝"重新拍攝這張照片。
 						</Text>
 						
 						<div style={{ 
@@ -293,7 +293,7 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 									fontWeight: '600'
 								}}
 							>
-								重新拍摄
+								重新拍攝
 							</Button>
 							<Button 
 								type="primary" 
@@ -312,7 +312,7 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 					</div>
 				</div>
 				
-				{/* 拍摄进度 */}
+				{/* 拍攝進度 */}
 				<div style={{ 
 					background: 'rgba(24, 144, 255, 0.1)', 
 					padding: '12px 24px', 
@@ -327,7 +327,7 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 		);
 	}
 
-	// 正常拍摄界面
+	// 正常拍攝界面
 	return (
 		<div style={{ 
 			display: 'flex', 
@@ -336,7 +336,7 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 			maxWidth: 1200,
 			alignItems: 'flex-start'
 		}}>
-			{/* 主拍摄区域 */}
+			{/* 主拍攝區域 */}
 			<Card
 				style={{
 					position: 'relative',
@@ -387,7 +387,7 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 				</div>
 			</Card>
 			
-			{/* 已拍摄照片列表 */}
+			{/* 已拍攝照片列表 */}
 			{captures.length > 0 && (
 				<Card
 					style={{
@@ -422,12 +422,12 @@ export default function ShootingScreen({ selectedFrame, onComplete }) {
 							>
 								<img
 									src={capture}
-									alt={`拍摄照片 ${index + 1}`}
+									alt={`拍攝照片 ${index + 1}`}
 									style={{
 										width: '100%',
 										height: '120px',
 										objectFit: 'cover',
-										transform: 'scaleX(-1)' // 镜像翻转
+										transform: 'scaleX(-1)' // 鏡像翻轉
 									}}
 								/>
 								<div style={{
