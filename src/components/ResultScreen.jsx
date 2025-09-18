@@ -31,6 +31,7 @@ export default function ResultScreen({ captures, selectedFrame, onRetake }) {
 					img.src = capture;
 					img.onload = () => {
 						const pos = selectedFrame.positions[index];
+						// 針對每張拍到的影像做水平鏡像後再繪製
 						const tempCanvas = document.createElement('canvas');
 						const tempCtx = tempCanvas.getContext('2d');
 						tempCanvas.width = img.width;
@@ -66,15 +67,25 @@ export default function ResultScreen({ captures, selectedFrame, onRetake }) {
 	return (
 		<Card
 			style={{
-				maxWidth: 1024,
+				maxWidth: 1000,
 				width: '100%',
-				borderRadius: 24,
-				background: 'rgba(255,255,255,0.8)',
-				backdropFilter: 'blur(6px)'
+				borderRadius: 16,
+				background: 'rgba(255,255,255,0.95)',
+				backdropFilter: 'blur(10px)',
+				boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+				border: '1px solid rgba(255,255,255,0.2)'
 			}}
-			bodyStyle={{ padding: 24, textAlign: 'center' }}
+			bodyStyle={{ padding: 32, textAlign: 'center' }}
 		>
-			<Title level={2} style={{ marginBottom: 16 }}>你的專屬拍貼！</Title>
+			<Title level={2} style={{ 
+				marginBottom: 24,
+				fontSize: '2rem',
+				fontWeight: 600,
+				background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+				WebkitBackgroundClip: 'text',
+				WebkitTextFillColor: 'transparent',
+				backgroundClip: 'text'
+			}}>你的專屬拍貼！</Title>
 			<div style={{ position: 'relative', width: '100%', aspectRatio: '1000 / 825', background: '#e5e7eb', borderRadius: 12, marginBottom: 16, ...centerFull }}>
 				{isLoading && (
 					<Space direction="vertical" align="center" style={{ color: '#6b7280' }}>
@@ -87,9 +98,37 @@ export default function ResultScreen({ captures, selectedFrame, onRetake }) {
 					<img src={finalImage} alt="Final photobooth strip" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 12, boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }} />
 				)}
 			</div>
-			<Space>
-				<Button onClick={onRetake}>重新拍攝</Button>
-				<Button type="primary" onClick={handleDownload} disabled={isLoading}>
+			<Space size="large">
+				<Button 
+					onClick={onRetake}
+					style={{
+						height: 48,
+						fontSize: 16,
+						fontWeight: 600,
+						padding: '0 32px',
+						borderRadius: 24,
+						border: '2px solid #e2e8f0',
+						color: '#64748b',
+						background: 'transparent'
+					}}
+				>
+					重新拍攝
+				</Button>
+				<Button 
+					type="primary" 
+					onClick={handleDownload} 
+					disabled={isLoading}
+					style={{
+						height: 48,
+						fontSize: 16,
+						fontWeight: 600,
+						padding: '0 32px',
+						borderRadius: 24,
+						background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+						border: 'none',
+						boxShadow: '0 8px 20px rgba(102, 126, 234, 0.3)'
+					}}
+				>
 					{isLoading ? '處理中...' : '下載成品'}
 				</Button>
 			</Space>

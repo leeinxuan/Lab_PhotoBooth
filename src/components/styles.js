@@ -12,9 +12,9 @@ export const gradientBackground = {
 	display: 'flex',
 	alignItems: 'center',
 	justifyContent: 'center',
-	padding: 16,
-	background: 'linear-gradient(135deg, #fbcfe8, #ddd6fe 40%, #c7d2fe)',
-	fontFamily: 'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, Apple Color Emoji, Segoe UI Emoji'
+	padding: 20,
+	background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)',
+	fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
 };
 
 
